@@ -52,9 +52,6 @@ RUN apk --no-cache add \
 # Copy composer
 COPY --from=i386/composer /usr/bin/composer /usr/bin/composer
 
-# Add configuration files
-COPY --chown=nobody rootfs/ /
-
 # Switch to use a non-root user from here on
 USER nobody
 
