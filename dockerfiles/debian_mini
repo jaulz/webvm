@@ -1,4 +1,4 @@
-FROM --platform=i386 i386/alpine
+FROM --platform=i386 i386/alpine:latest
 
 # Install packages
 RUN apk --no-cache add \
