@@ -2,7 +2,7 @@ FROM --platform=i386 i386/php:8.0-alpine
 
 COPY --from=i386/composer /usr/bin/composer /usr/bin/composer
 
-RUN useradd -m user && echo "user:password" | chpasswd
+#RUN useradd -m user && echo "user:password" | chpasswd
 # We set WORKDIR, as this gets extracted by Webvm to be used as the cwd. This is optional.
 #WORKDIR /home/user/
 # We set env, as this gets extracted by Webvm. This is optional.
