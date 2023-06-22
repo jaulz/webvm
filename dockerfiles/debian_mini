@@ -1,65 +1,57 @@
 FROM --platform=i386 i386/alpine:latest
 
 # Install packages
+# RUN apk add --no-cache \
+# 	alpine-sdk python3 vim unzip ruby nodejs fakeroot dbus bash newt \
+# 	patch man-pages file luajit make lua5.4 dialog curl less \
+# 	netcat-openbsd openssh-client busybox-extras mini_httpd haserl
 RUN apk --no-cache add \
-        php81 \
-        php81-fpm \
-        php81-opcache \
-        php81-pecl-apcu \
-        php81-mysqli \
-        php81-pgsql \
-        php81-json \
-        php81-openssl \
-        php81-curl \
-        php81-zlib \
-        php81-soap \
-        php81-xml \
-        php81-fileinfo \
-        php81-phar \
-        php81-intl \
-        php81-dom \
-        php81-xmlreader \
-        php81-ctype \
-        php81-session \
-        php81-iconv \
-        php81-tokenizer \
-        php81-zip \
-        php81-simplexml \
-        php81-mbstring \
-        php81-gd \
-        nginx \
-        runit \
+        bash \
         curl \
-# Bring in gettext so we can get `envsubst`, then throw
-# the rest away. To do this, we need to install `gettext`
-# then move `envsubst` out of the way so `gettext` can
-# be deleted completely, then move `envsubst` back.
-    && apk add --no-cache --virtual .gettext gettext \
-    && mv /usr/bin/envsubst /tmp/ \
-    && runDeps="$( \
-        scanelf --needed --nobanner /tmp/envsubst \
-            | awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \
-            | sort -u \
-            | xargs -r apk info --installed \
-            | sort -u \
-    )" \
-    && apk add --no-cache $runDeps \
-    && apk del .gettext \
-    && mv /tmp/envsubst /usr/local/bin/ \
+        nodejs \
+        php81 \
+        # php81-fpm \
+        # php81-opcache \
+        # php81-pecl-apcu \
+        # php81-mysqli \
+        # php81-pgsql \
+        # php81-json \
+        # php81-openssl \
+        # php81-curl \
+        # php81-zlib \
+        # php81-soap \
+        # php81-xml \
+        # php81-fileinfo \
+        # php81-phar \
+        # php81-intl \
+        # php81-dom \
+        # php81-xmlreader \
+        # php81-ctype \
+        # php81-session \
+        # php81-iconv \
+        # php81-tokenizer \
+        # php81-zip \
+        # php81-simplexml \
+        # php81-mbstring \
+        # php81-gd \
+        unzip \
 # Remove alpine cache
     && rm -rf /var/cache/apk/*
 
 # Copy composer
 COPY --from=i386/composer /usr/bin/composer /usr/bin/composer
 
-#RUN useradd -m user && echo "user:password" | chpasswd
-# We set WORKDIR, as this gets extracted by Webvm to be used as the cwd. This is optional.
-#WORKDIR /home/user/
-# We set env, as this gets extracted by Webvm. This is optional.
-#ENV HOME="/home/user" TERM="xterm" USER="user" SHELL="/bin/bash" EDITOR="vim" LANG="en_US.UTF-8" LC_ALL="C"
-RUN echo 'root:password' | chpasswd
+# Add user
+RUN adduser -D user && echo "user:password" | chpasswd
+COPY --chown=user:user ./examples /home/user/examples
 
-# Switch to use a non-root user from here on
-USER nobody
+# We set WORKDIR, as this gets extracted by Webvm to be used as the cwd. This is optional.
+WORKDIR /home/user/
+
+# We set env, as this gets extracted by Webvm. This is optional.
+ENV HOME="/home/user" TERM="xterm" USER="user" SHELL="/bin/bash" EDITOR="vim" LANG="en_US.UTF-8" LC_ALL="C"
+
+# Set root password
+RUN echo 'root:password' | chpasswd
 
 CMD [ "/bin/bash" ]
